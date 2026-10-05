@@ -76,10 +76,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* ==================================================
-       PROMPT
-       ================================================== */
-
     .prompt {
       text-align: center;
       color: var(--muted);
@@ -106,10 +102,6 @@
       font-size: 0.84rem;
       line-height: 1.45;
     }
-
-    /* ==================================================
-       ANSWER
-       ================================================== */
 
     .answer-label {
       margin: 20px 0 9px;
@@ -161,10 +153,6 @@
 
       background: var(--card);
     }
-
-    /* ==================================================
-       PALETTE
-       ================================================== */
 
     .palette {
       margin-top: 16px;
@@ -230,10 +218,6 @@
       font-size: 0.76rem;
     }
 
-    /* ==================================================
-       BUTTONS
-       ================================================== */
-
     .edit-actions,
     .main-actions {
       display: flex;
@@ -287,10 +271,6 @@
       background: var(--panel);
     }
 
-    /* ==================================================
-       FEEDBACK
-       ================================================== */
-
     .feedback {
       display: none;
 
@@ -328,10 +308,6 @@
 
       color: var(--red);
     }
-
-    /* ==================================================
-       EXPLANATION
-       ================================================== */
 
     .explanation {
       padding: 15px 16px;
@@ -387,10 +363,6 @@
       color: var(--text);
     }
 
-    /* ==================================================
-       RESPONSIVE
-       ================================================== */
-
     @media (max-width: 650px) {
 
       .app {
@@ -421,10 +393,6 @@
 
   <section class="card">
 
-    <!-- ==================================================
-         PROMPT
-         ================================================== -->
-
     <div class="prompt">
       Write this Hindu-Arabic numeral as an Egyptian numeral.
     </div>
@@ -439,11 +407,6 @@
       Egyptian numerals are additive. Click each symbol as many times as you need.
     </div>
 
-
-    <!-- ==================================================
-         ANSWER
-         ================================================== -->
-
     <div class="answer-label">
       Your Egyptian numeral
     </div>
@@ -452,11 +415,6 @@
       id="answerArea"
       class="answer">
     </div>
-
-
-    <!-- ==================================================
-         SYMBOL PALETTE
-         ================================================== -->
 
     <div class="palette">
 
@@ -468,7 +426,6 @@
         id="symbolButtons"
         class="symbol-buttons">
       </div>
-
 
       <div class="edit-actions">
 
@@ -490,11 +447,6 @@
 
     </div>
 
-
-    <!-- ==================================================
-         MAIN CONTROLS
-         ================================================== -->
-
     <div class="main-actions">
 
       <button
@@ -513,11 +465,6 @@
 
     </div>
 
-
-    <!-- ==================================================
-         FEEDBACK
-         ================================================== -->
-
     <div
       id="feedback"
       class="feedback"
@@ -530,195 +477,111 @@
 
 
 <script>
-
 (() => {
 
-  /*
-    ==================================================
-    DOM
-    ==================================================
-  */
-
   const problemNumber =
-    document.getElementById(
-      "problemNumber"
-    );
-
+    document.getElementById("problemNumber");
 
   const answerArea =
-    document.getElementById(
-      "answerArea"
-    );
-
+    document.getElementById("answerArea");
 
   const symbolButtons =
-    document.getElementById(
-      "symbolButtons"
-    );
-
+    document.getElementById("symbolButtons");
 
   const feedback =
-    document.getElementById(
-      "feedback"
-    );
-
+    document.getElementById("feedback");
 
   const undoButton =
-    document.getElementById(
-      "undoButton"
-    );
-
+    document.getElementById("undoButton");
 
   const clearButton =
-    document.getElementById(
-      "clearButton"
-    );
-
+    document.getElementById("clearButton");
 
   const checkButton =
-    document.getElementById(
-      "checkButton"
-    );
-
+    document.getElementById("checkButton");
 
   const nextButton =
-    document.getElementById(
-      "nextButton"
-    );
+    document.getElementById("nextButton");
 
 
-  /*
-    ==================================================
-    EGYPTIAN PLACE VALUES
-    ==================================================
-  */
-
-  const values =
-    [
-      1000000,
-      100000,
-      10000,
-      1000,
-      100,
-      10,
-      1
-    ];
+  const values = [
+    1000000,
+    100000,
+    10000,
+    1000,
+    100,
+    10,
+    1
+  ];
 
 
-  const labels =
-    [
-      "1,000,000",
-      "100,000",
-      "10,000",
-      "1,000",
-      "100",
-      "10",
-      "1"
-    ];
+  const labels = [
+    "1,000,000",
+    "100,000",
+    "10,000",
+    "1,000",
+    "100",
+    "10",
+    "1"
+  ];
 
 
-  /*
-    ==================================================
-    STATE
-    ==================================================
-  */
+  let targetNumber = 1;
 
-  let targetNumber =
-    1;
+  let previousNumber = null;
 
+  let history = [];
 
-  let previousNumber =
-    null;
-
-
-  let history =
-    [];
-
-
-  const counts =
-    {};
+  const counts = {};
 
 
   values.forEach(
     value => {
-
-      counts[value] =
-        0;
-
+      counts[value] = 0;
     }
   );
 
-
-  /*
-    ==================================================
-    EGYPTIAN SYMBOLS
-    ==================================================
-  */
 
   function symbolSvg(
     value,
     size = 56
   ) {
 
-    const common =
-      `
-        width="${size}"
-        height="${size}"
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      `;
+    const common = `
+      width="${size}"
+      height="${size}"
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+    `;
 
 
-    const line =
-      `
-        stroke="currentColor"
-        fill="none"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      `;
+    const line = `
+      stroke="currentColor"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    `;
 
 
-    /*
-      --------------------------------
-      1
-      Single stroke
-      --------------------------------
-    */
-
-    if (
-      value ===
-      1
-    ) {
+    /* 1 */
+    if (value === 1) {
 
       return `
         <svg ${common}>
 
           <path
-            d="
-              M32 9
-              L32 55
-            "
+            d="M32 9 L32 55"
             ${line}
             stroke-width="3.3">
           </path>
 
         </svg>
       `;
-
     }
 
 
-    /*
-      --------------------------------
-      10
-      Cattle hobble
-      --------------------------------
-    */
-
-    if (
-      value ===
-      10
-    ) {
+    /* 10 */
+    if (value === 10) {
 
       return `
         <svg ${common}>
@@ -745,21 +608,11 @@
 
         </svg>
       `;
-
     }
 
 
-    /*
-      --------------------------------
-      100
-      Spiral / coil
-      --------------------------------
-    */
-
-    if (
-      value ===
-      100
-    ) {
+    /* 100 */
+    if (value === 100) {
 
       return `
         <svg ${common}>
@@ -780,21 +633,11 @@
 
         </svg>
       `;
-
     }
 
 
-    /*
-      --------------------------------
-      1,000
-      Lotus flower
-      --------------------------------
-    */
-
-    if (
-      value ===
-      1000
-    ) {
+    /* 1,000 */
+    if (value === 1000) {
 
       return `
         <svg ${common}>
@@ -814,16 +657,11 @@
             stroke-width="3">
           </path>
 
-
           <path
-            d="
-              M31 33
-              L31 49
-            "
+            d="M31 33 L31 49"
             ${line}
             stroke-width="3.3">
           </path>
-
 
           <path
             d="
@@ -833,7 +671,6 @@
             ${line}
             stroke-width="3">
           </path>
-
 
           <path
             d="
@@ -846,39 +683,23 @@
             stroke-width="3">
           </path>
 
-
           <path
-            d="
-              M22 55
-              L40 55
-            "
+            d="M22 55 L40 55"
             ${line}
             stroke-width="3.2">
           </path>
 
         </svg>
       `;
-
     }
 
 
     /*
-      --------------------------------
       10,000
       Pointing finger
-
-      Straight vertical lower section,
-      then bends diagonally about 45°
-      to the right.
-
-      Small internal line = fingernail.
-      --------------------------------
+      Straight bottom with no notch
     */
-
-    if (
-      value ===
-      10000
-    ) {
+    if (value === 10000) {
 
       return `
         <svg ${common}>
@@ -887,25 +708,15 @@
             d="
               M25 55
               L25 22
-
               L37 7
-
               L43 12
-
               L33 26
-
-              L33 49
-
-              L38 49
-
-              L38 55
-
+              L33 55
               Z
             "
             ${line}
             stroke-width="3">
           </path>
-
 
           <path
             d="
@@ -918,21 +729,11 @@
 
         </svg>
       `;
-
     }
 
 
-    /*
-      --------------------------------
-      100,000
-      Tadpole / frog
-      --------------------------------
-    */
-
-    if (
-      value ===
-      100000
-    ) {
+    /* 100,000 */
+    if (value === 100000) {
 
       return `
         <svg ${common}>
@@ -940,23 +741,16 @@
           <path
             d="
               M12 27
-
               C18 19 29 17 39 20
-
               C47 22 52 28 51 34
-
               C50 40 43 43 36 42
-
               C28 41 22 37 19 33
-
               C16 31 14 29 12 27
-
               Z
             "
             fill="currentColor"
             stroke="none">
           </path>
-
 
           <ellipse
             cx="43"
@@ -965,7 +759,6 @@
             ry="1.8"
             fill="white">
           </ellipse>
-
 
           <path
             d="
@@ -976,16 +769,11 @@
             stroke-width="3.2">
           </path>
 
-
           <path
-            d="
-              M18 49
-              L12 49
-            "
+            d="M18 49 L12 49"
             ${line}
             stroke-width="3.2">
           </path>
-
 
           <path
             d="
@@ -995,7 +783,6 @@
             ${line}
             stroke-width="3">
           </path>
-
 
           <path
             d="
@@ -1008,48 +795,31 @@
 
         </svg>
       `;
-
     }
 
 
-    /*
-      --------------------------------
-      1,000,000
-      Kneeling person with raised arms
-      --------------------------------
-    */
-
+    /* 1,000,000 */
     return `
       <svg ${common}>
 
         <path
           d="
             M32 13
-
             C28 13 25 16 25 20
-
             C25 24 28 27 32 27
-
             C36 27 39 24 39 20
-
             C39 16 36 13 32 13
-
             Z
           "
           ${line}
           stroke-width="3">
         </path>
 
-
         <path
-          d="
-            M32 27
-            L32 43
-          "
+          d="M32 27 L32 43"
           ${line}
           stroke-width="3.2">
         </path>
-
 
         <path
           d="
@@ -1061,7 +831,6 @@
           stroke-width="3.2">
         </path>
 
-
         <path
           d="
             M33 31
@@ -1071,7 +840,6 @@
           ${line}
           stroke-width="3.2">
         </path>
-
 
         <path
           d="
@@ -1083,7 +851,6 @@
           stroke-width="2.7">
         </path>
 
-
         <path
           d="
             M49 17 L44 11
@@ -1093,7 +860,6 @@
           ${line}
           stroke-width="2.7">
         </path>
-
 
         <path
           d="
@@ -1105,7 +871,6 @@
           stroke-width="3.2">
         </path>
 
-
         <path
           d="
             M32 43
@@ -1115,7 +880,6 @@
           ${line}
           stroke-width="3.2">
         </path>
-
 
         <path
           d="
@@ -1128,164 +892,74 @@
 
       </svg>
     `;
-
   }
 
 
-  /*
-    ==================================================
-    RANDOM NUMBER GENERATOR
-    ==================================================
-
-    Most individual digits are 0–5.
-
-    Occasionally a 6–9 appears so students
-    still receive practice with larger
-    repetitions.
-
-    ==================================================
-  */
-
   function weightedDigit() {
 
-    if (
-      Math.random() <
-      0.88
-    ) {
+    if (Math.random() < 0.88) {
 
       return Math.floor(
-        Math.random() *
-        6
+        Math.random() * 6
       );
-
     }
-
 
     return (
       6 +
       Math.floor(
-        Math.random() *
-        4
+        Math.random() * 4
       )
     );
-
   }
 
 
   function generateNumber() {
 
-    /*
-      Occasionally include exactly
-      1,000,000.
-    */
-
-    if (
-      Math.random() <
-      0.02
-    ) {
-
+    if (Math.random() < 0.02) {
       return 1000000;
-
     }
 
-
-    /*
-      Very occasionally include zero.
-    */
-
-    if (
-      Math.random() <
-      0.01
-    ) {
-
+    if (Math.random() < 0.01) {
       return 0;
-
     }
-
-
-    /*
-      Vary the number of digits.
-    */
 
     const random =
       Math.random();
 
-
     let length;
 
-
-    if (
-      random <
-      0.12
-    ) {
-
-      length =
-        2;
-
+    if (random < 0.12) {
+      length = 2;
     }
-
-    else if (
-      random <
-      0.36
-    ) {
-
-      length =
-        3;
-
+    else if (random < 0.36) {
+      length = 3;
     }
-
-    else if (
-      random <
-      0.64
-    ) {
-
-      length =
-        4;
-
+    else if (random < 0.64) {
+      length = 4;
     }
-
-    else if (
-      random <
-      0.84
-    ) {
-
-      length =
-        5;
-
+    else if (random < 0.84) {
+      length = 5;
     }
-
     else {
-
-      length =
-        6;
-
+      length = 6;
     }
 
-
-    const digits =
-      [];
-
+    const digits = [];
 
     let firstDigit;
-
 
     do {
 
       firstDigit =
         weightedDigit();
 
-    }
-
-    while (
-      firstDigit ===
-      0
+    } while (
+      firstDigit === 0
     );
-
 
     digits.push(
       firstDigit
     );
-
 
     for (
       let index = 1;
@@ -1296,42 +970,26 @@
       digits.push(
         weightedDigit()
       );
-
     }
-
 
     return Number(
       digits.join("")
     );
-
   }
 
 
-  /*
-    ==================================================
-    CORRECT SYMBOL COUNTS
-    ==================================================
-  */
-
   function getTargetCounts() {
 
-    const result =
-      {};
-
+    const result = {};
 
     values.forEach(
       value => {
-
-        result[value] =
-          0;
-
+        result[value] = 0;
       }
     );
 
-
     let remaining =
       targetNumber;
-
 
     for (
       const value
@@ -1340,36 +998,23 @@
 
       result[value] =
         Math.floor(
-          remaining /
-          value
+          remaining / value
         );
-
 
       remaining %=
         value;
-
     }
 
-
     return result;
-
   }
 
-
-  /*
-    ==================================================
-    RENDER SYMBOL GROUPS
-    ==================================================
-  */
 
   function renderGroups(
     sourceCounts,
     showEmpty = true
   ) {
 
-    const groups =
-      [];
-
+    const groups = [];
 
     for (
       const value
@@ -1377,18 +1022,13 @@
     ) {
 
       const count =
-        sourceCounts[value] ||
-        0;
-
+        sourceCounts[value] || 0;
 
       if (
-        count >
-        0
+        count > 0
       ) {
 
-        let symbols =
-          "";
-
+        let symbols = "";
 
         for (
           let index = 0;
@@ -1401,40 +1041,29 @@
               value,
               46
             );
-
         }
-
 
         groups.push(
           `
             <div
               class="symbol-group"
-              title="
-                ${count}
-                ×
-                ${value.toLocaleString("en-US")}
-              ">
+              title="${count} × ${value.toLocaleString("en-US")}">
 
               ${symbols}
 
             </div>
           `
         );
-
       }
-
     }
 
-
     if (
-      groups.length ===
-        0 &&
+      groups.length === 0 &&
       showEmpty
     ) {
 
       if (
-        targetNumber ===
-        0
+        targetNumber === 0
       ) {
 
         return `
@@ -1450,9 +1079,7 @@
 
           </div>
         `;
-
       }
-
 
       return `
         <div class="empty">
@@ -1462,12 +1089,9 @@
 
         </div>
       `;
-
     }
 
-
     return groups.join("");
-
   }
 
 
@@ -1478,15 +1102,8 @@
         counts,
         true
       );
-
   }
 
-
-  /*
-    ==================================================
-    SYMBOL BUTTONS
-    ==================================================
-  */
 
   function renderSymbolButtons() {
 
@@ -1510,14 +1127,11 @@
                 )}
 
                 <span class="symbol-value-label">
-
                   ${labels[index]}
-
                 </span>
 
               </button>
             `;
-
           }
         )
         .join("");
@@ -1544,111 +1158,70 @@
                 button.dataset.value
               );
 
-
-            /*
-              Egyptian numerals never
-              require more than nine
-              copies of one symbol.
-            */
-
             if (
-              counts[value] >=
-              9
+              counts[value] >= 9
             ) {
 
               feedback.className =
                 "feedback incorrect";
-
 
               feedback.innerHTML =
                 `
                   <div class="feedback-head">
 
                     <strong>
-
                       You never need more than
                       9 of the same symbol.
-
                     </strong>
 
                   </div>
                 `;
 
-
               return;
-
             }
 
-
             counts[value]++;
-
 
             history.push(
               value
             );
 
-
             clearFeedback();
 
             renderAnswer();
-
           }
-
         );
-
       }
     );
-
   }
 
-
-  /*
-    ==================================================
-    FEEDBACK
-    ==================================================
-  */
 
   function clearFeedback() {
 
     feedback.className =
       "feedback";
 
-
     feedback.innerHTML =
       "";
-
   }
 
-
-  /*
-    ==================================================
-    EDITING
-    ==================================================
-  */
 
   function undoLastSymbol() {
 
     const value =
       history.pop();
 
-
     if (
-      value ===
-      undefined
+      value === undefined
     ) {
-
       return;
-
     }
 
-
     counts[value]--;
-
 
     clearFeedback();
 
     renderAnswer();
-
   }
 
 
@@ -1656,40 +1229,24 @@
 
     values.forEach(
       value => {
-
-        counts[value] =
-          0;
-
+        counts[value] = 0;
       }
     );
 
-
-    history =
-      [];
-
+    history = [];
 
     clearFeedback();
 
     renderAnswer();
-
   }
 
-
-  /*
-    ==================================================
-    EXPLANATION
-    ==================================================
-  */
 
   function buildExplanation() {
 
     const correctCounts =
       getTargetCounts();
 
-
-    const terms =
-      [];
-
+    const terms = [];
 
     for (
       const value
@@ -1703,15 +1260,12 @@
         terms.push(
           `${correctCounts[value]} × ${value.toLocaleString("en-US")}`
         );
-
       }
-
     }
 
 
     const correctVisual =
-      targetNumber ===
-        0
+      targetNumber === 0
 
         ? `
             <div class="empty">
@@ -1734,22 +1288,15 @@
           The correct Egyptian numeral is:
         </div>
 
-
         <div class="correct-answer">
-
           ${correctVisual}
-
         </div>
-
 
         <div class="math-box">
 
           ${
-            targetNumber ===
-              0
-
+            targetNumber === 0
               ? "0"
-
               : terms.join(" + ")
           }
 
@@ -1763,21 +1310,13 @@
 
       </div>
     `;
-
   }
 
-
-  /*
-    ==================================================
-    CHECK ANSWER
-    ==================================================
-  */
 
   function checkAnswer() {
 
     const correctCounts =
       getTargetCounts();
-
 
     const correct =
       values.every(
@@ -1794,7 +1333,6 @@
       feedback.className =
         "feedback correct";
 
-
       feedback.innerHTML =
         `
           <strong>
@@ -1809,15 +1347,12 @@
           as an Egyptian numeral.
         `;
 
-
       return;
-
     }
 
 
     feedback.className =
       "feedback incorrect";
-
 
     feedback.innerHTML =
       `
@@ -1834,29 +1369,19 @@
 
         ${buildExplanation()}
       `;
-
   }
 
-
-  /*
-    ==================================================
-    NEW QUESTION
-    ==================================================
-  */
 
   function newQuestion() {
 
     let number;
-
 
     do {
 
       number =
         generateNumber();
 
-    }
-
-    while (
+    } while (
       number ===
       previousNumber
     );
@@ -1865,23 +1390,18 @@
     previousNumber =
       number;
 
-
     targetNumber =
       number;
 
 
     values.forEach(
       value => {
-
-        counts[value] =
-          0;
-
+        counts[value] = 0;
       }
     );
 
 
-    history =
-      [];
+    history = [];
 
 
     problemNumber.textContent =
@@ -1893,15 +1413,8 @@
     clearFeedback();
 
     renderAnswer();
-
   }
 
-
-  /*
-    ==================================================
-    EVENTS
-    ==================================================
-  */
 
   undoButton.addEventListener(
     "click",
@@ -1926,12 +1439,6 @@
     newQuestion
   );
 
-
-  /*
-    ==================================================
-    START
-    ==================================================
-  */
 
   renderSymbolButtons();
 
